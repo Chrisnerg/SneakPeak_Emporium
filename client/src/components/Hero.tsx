@@ -94,14 +94,14 @@ export default function Hero({ onShop, onDrops }: HeroProps) {
   const embedUrl = `https://www.kiriengine.app/share/embed/${selected.embedId}?userId=1203811&bg_theme=dark&btn=1`;
 
   return (
-    <section style={{
+    <section className="sp-hero-layout" style={{
       display: "grid",
       gridTemplateColumns: "1fr 1fr",
       minHeight: "calc(100vh - 88px)",
       background: "#F5F3EE",
     }}>
       {/* LEFT — Text content */}
-      <div style={{
+      <div className="sp-hero-left" style={{
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -184,7 +184,7 @@ export default function Hero({ onShop, onDrops }: HeroProps) {
         </div>
 
         {/* Stats row */}
-        <div style={{
+        <div className="sp-hero-stats" style={{
           display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
           borderTop: "1px solid rgba(0,0,0,0.1)", paddingTop: 24, marginTop: 32,
         }}>
@@ -208,8 +208,84 @@ export default function Hero({ onShop, onDrops }: HeroProps) {
           ))}
         </div>
 
+        <div className="sp-hero-mobile-product" style={{ display: "none", marginTop: 22 }}>
+          <div
+            style={{
+              border: "2px solid #0A0A0A",
+              background: "#0A0A0A",
+              color: "#F5F3EE",
+              padding: "16px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 8,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.4)",
+                fontFamily: "'JetBrains Mono', monospace",
+                marginBottom: 8,
+              }}
+            >
+              Featured Shoe
+            </div>
+            <div
+              style={{
+                fontSize: 18,
+                fontWeight: 800,
+                letterSpacing: "-0.03em",
+                fontFamily: "'JetBrains Mono', monospace",
+                marginBottom: 6,
+              }}
+            >
+              {selected.label}
+            </div>
+            <div
+              style={{
+                fontSize: 10,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.6)",
+                fontFamily: "'JetBrains Mono', monospace",
+                marginBottom: 12,
+              }}
+            >
+              {selected.brand} · {selected.model}
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+              <span
+                style={{
+                  fontSize: 20,
+                  fontWeight: 900,
+                  letterSpacing: "-0.03em",
+                  fontFamily: "'JetBrains Mono', monospace",
+                }}
+              >
+                {selected.price}
+              </span>
+              <button
+                onClick={onShop}
+                style={{
+                  background: "#FF0000",
+                  color: "#fff",
+                  border: "none",
+                  padding: "10px 12px",
+                  fontSize: 9,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  cursor: "crosshair",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontWeight: 700,
+                }}
+              >
+                Shop
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Vertical label */}
-        <div style={{
+        <div className="sp-hero-vertical-label" style={{
           position: "absolute", bottom: 40, right: -40,
           transform: "rotate(90deg)", transformOrigin: "left center",
           fontSize: 7, letterSpacing: "0.3em", textTransform: "uppercase",
@@ -220,7 +296,7 @@ export default function Hero({ onShop, onDrops }: HeroProps) {
       </div>
 
       {/* RIGHT — KiriEngine 3D Shoe viewer (black panel) */}
-      <div style={{
+      <div className="sp-hero-right" style={{
         background: "#0A0A0A", position: "relative",
         display: "flex", flexDirection: "column", overflow: "hidden",
       }}>
@@ -319,7 +395,7 @@ export default function Hero({ onShop, onDrops }: HeroProps) {
           </div>
 
           {/* Scrollable shoe selector row */}
-          <div style={{
+          <div className="sp-hero-shoe-selector" style={{
             display: "flex",
             gap: 8,
             overflowX: "auto",
@@ -440,13 +516,36 @@ export default function Hero({ onShop, onDrops }: HeroProps) {
 
       {/* Mobile responsive */}
       <style>{`
-        @media (max-width: 768px) {
-          section[style*="gridTemplateColumns"] {
+        @media (max-width: 980px) {
+          .sp-hero-layout {
             grid-template-columns: 1fr !important;
+            min-height: auto !important;
+          }
+
+          .sp-hero-left {
+            border-right: none !important;
+            padding: 32px 18px 24px !important;
+          }
+
+          .sp-hero-right {
+            display: none !important;
+          }
+
+          .sp-hero-mobile-product {
+            display: block !important;
+          }
+
+          .sp-hero-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 14px;
+          }
+
+          .sp-hero-vertical-label {
+            display: none !important;
           }
         }
         /* Hide scrollbar for shoe selector */
-        div[style*="overflowX: auto"]::-webkit-scrollbar {
+        .sp-hero-shoe-selector::-webkit-scrollbar {
           display: none;
         }
       `}</style>
