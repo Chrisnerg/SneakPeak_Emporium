@@ -11,6 +11,7 @@ interface ShopProps {
 }
 
 const AUDIENCES: Audience[] = ["men", "women", "kids"];
+const MOBILE_CATEGORIES = ["Lifestyle", "Jordan", "Running", "Basketball", "Training", "Football"];
 const BRANDS = Array.from(new Set(CATALOG.map((product) => product.brand)));
 const SIZES = Array.from(new Set(CATALOG.flatMap((product) => product.sizes))).sort((left, right) => left - right);
 const CONDITIONS = ["NEW", "SALE", "LIMITED"] as const;
@@ -81,6 +82,10 @@ export default function Shop({ onAddToCart, defaultAudience = "all", title, desc
     ...selectedSizes.map((value) => ({ label: `UK ${value}`, onRemove: () => setSelectedSizes((current) => current.filter((item) => item !== value)) })),
     ...selectedConditions.map((value) => ({ label: value, onRemove: () => setSelectedConditions((current) => current.filter((item) => item !== value)) })),
   ];
+
+  const mobileHeading = defaultAudience === "all"
+    ? "Shop Sneakers & Shoes"
+    : `${defaultAudience.charAt(0).toUpperCase() + defaultAudience.slice(1)}'s Trainers & Shoes`;
 
   useEffect(() => {
     if (!filtersOpen) {
@@ -313,6 +318,109 @@ export default function Shop({ onAddToCart, defaultAudience = "all", title, desc
           </aside>
 
           <div style={{ padding: "16px 8px 0 16px" }}>
+            <div className="sp-mobile-shop-head" style={{ display: "none" }}>
+              <h2
+                style={{
+                  margin: "0 0 18px",
+                  fontSize: "clamp(28px, 6vw, 42px)",
+                  fontWeight: 900,
+                  letterSpacing: "-0.03em",
+                  color: "#0A0A0A",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  lineHeight: 1.06,
+                }}
+              >
+                {mobileHeading} ({visibleProducts.length})
+              </h2>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: 20,
+                  overflowX: "auto",
+                  paddingBottom: 10,
+                  marginBottom: 14,
+                  borderBottom: "1px solid rgba(0,0,0,0.16)",
+                }}
+              >
+                {MOBILE_CATEGORIES.map((category) => (
+                  <button
+                    key={category}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      fontSize: 10,
+                      letterSpacing: "0.02em",
+                      color: "#0A0A0A",
+                      whiteSpace: "nowrap",
+                      fontFamily: "'JetBrains Mono', monospace",
+                      cursor: "crosshair",
+                    }}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 10 }}>
+                <button
+                  onClick={() => setFiltersOpen(true)}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    border: "2px solid #0A0A0A",
+                    borderRadius: 999,
+                    background: "#fff",
+                    padding: "10px 16px",
+                    fontSize: 10,
+                    letterSpacing: "0.02em",
+                    color: "#0A0A0A",
+                    fontFamily: "'JetBrains Mono', monospace",
+                    cursor: "crosshair",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <SlidersHorizontal size={14} /> ({activeFilterCount})
+                </button>
+                <button
+                  onClick={() => setFiltersOpen(true)}
+                  style={{
+                    border: "2px solid rgba(0,0,0,0.22)",
+                    borderRadius: 999,
+                    background: "#fff",
+                    padding: "10px 16px",
+                    fontSize: 10,
+                    letterSpacing: "0.02em",
+                    color: "#0A0A0A",
+                    fontFamily: "'JetBrains Mono', monospace",
+                    cursor: "crosshair",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Gender ({selectedAudiences.length || 1})
+                </button>
+                <button
+                  onClick={() => setSortMode(sortMode === "price-low" ? "newest" : "price-low")}
+                  style={{
+                    border: "2px solid rgba(0,0,0,0.22)",
+                    borderRadius: 999,
+                    background: "#fff",
+                    padding: "10px 16px",
+                    fontSize: 10,
+                    letterSpacing: "0.02em",
+                    color: "#0A0A0A",
+                    fontFamily: "'JetBrains Mono', monospace",
+                    cursor: "crosshair",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Shop By Price
+                </button>
+              </div>
+            </div>
+
             <div
               style={{
                 display: "flex",
@@ -514,8 +622,17 @@ export default function Shop({ onAddToCart, defaultAudience = "all", title, desc
         }
 
         @media (max-width: 980px) {
+          .sp-mobile-shop-head {
+            display: block !important;
+            margin-bottom: 14px;
+          }
+
           .sp-shop-layout {
             grid-template-columns: 1fr !important;
+          }
+
+          .sp-shop-layout > div {
+            padding: 16px 12px 0 12px !important;
           }
 
           .sp-shop-sidebar {
@@ -538,10 +655,12 @@ export default function Shop({ onAddToCart, defaultAudience = "all", title, desc
 
           .sp-shop-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+            border: none;
+            gap: 8px !important;
           }
 
           .sp-mobile-filter-toggle {
-            display: inline-flex !important;
+            display: none !important;
           }
 
           .sp-mobile-filter-head {
@@ -563,6 +682,10 @@ export default function Shop({ onAddToCart, defaultAudience = "all", title, desc
         @media (max-width: 760px) {
           .sp-shop-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .sp-shop-layout > div > div:first-child {
+            display: none !important;
           }
         }
 

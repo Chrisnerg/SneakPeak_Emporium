@@ -58,7 +58,7 @@ export default function ProductCard({ product, onAddToCart, variant = "default" 
 
       <div
         style={{
-          aspectRatio: isShop ? "0.9 / 1" : "4/3",
+          aspectRatio: isShop ? "1 / 1" : "4/3",
           overflow: "hidden",
           background: "#EBEBEB",
           cursor: "pointer",
@@ -73,6 +73,23 @@ export default function ProductCard({ product, onAddToCart, variant = "default" 
       </div>
 
       <div style={{ padding: isShop ? "14px 14px 14px" : "16px" }}>
+        {isShop && product.badge && (
+          <div
+            className="sp-mobile-justin"
+            style={{
+              fontSize: 9,
+              letterSpacing: "0.01em",
+              color: "#C23B2A",
+              fontFamily: "'JetBrains Mono', monospace",
+              marginBottom: 6,
+              fontWeight: 700,
+              textTransform: "none",
+              display: "none",
+            }}
+          >
+            {product.badge === "NEW" ? "Just In" : product.badge}
+          </div>
+        )}
         <div
           style={{
             fontSize: 8,
@@ -104,6 +121,7 @@ export default function ProductCard({ product, onAddToCart, variant = "default" 
           {product.sizes.slice(0, 4).map((size) => (
             <span
               key={size}
+              className="sp-shop-size-chip"
               style={{
                 fontSize: 8,
                 padding: isShop ? "2px 5px" : "2px 6px",
@@ -117,6 +135,7 @@ export default function ProductCard({ product, onAddToCart, variant = "default" 
           ))}
           {product.sizes.length > 4 && (
             <span
+              className="sp-shop-size-chip"
               style={{
                 fontSize: 8,
                 padding: "2px 6px",
@@ -144,6 +163,7 @@ export default function ProductCard({ product, onAddToCart, variant = "default" 
           </span>
           <div style={{ display: "flex", gap: 8 }}>
             <button
+              className="sp-card-action-view"
               onClick={() => setLocation(`/shop/${product.id}`)}
               style={{
                 display: "flex",
@@ -163,6 +183,7 @@ export default function ProductCard({ product, onAddToCart, variant = "default" 
               View
             </button>
             <button
+              className="sp-card-action-add"
               onClick={() => onAddToCart(product)}
               style={{
                 display: "flex",
@@ -188,6 +209,22 @@ export default function ProductCard({ product, onAddToCart, variant = "default" 
           </div>
         </div>
       </div>
+
+      {isShop && (
+        <style>{`
+          @media (max-width: 980px) {
+            .sp-card-action-view,
+            .sp-card-action-add,
+            .sp-shop-size-chip {
+              display: none !important;
+            }
+
+            .sp-mobile-justin {
+              display: block !important;
+            }
+          }
+        `}</style>
+      )}
     </div>
   );
 }
