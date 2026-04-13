@@ -16,7 +16,7 @@ export default function Home({ onAddToCart }: HomeProps) {
     <div style={{ minHeight: "100vh", background: "#F5F3EE" }}>
       <Hero onShop={() => setLocation("/shop")} onDrops={() => setLocation("/drops")} />
 
-      <section style={{ padding: "80px 56px", background: "#F5F3EE" }}>
+      <section style={{ padding: "80px 56px", background: "#F5F3EE" }} className="sp-home-products-section">
         <div
           style={{
             display: "flex",
@@ -279,8 +279,13 @@ export default function Home({ onAddToCart }: HomeProps) {
         }
 
         @media (max-width: 980px) {
+          .sp-home-products-section {
+            padding: 48px 14px !important;
+          }
+
           .sp-home-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px !important;
           }
 
           .sp-home-about {
@@ -291,7 +296,8 @@ export default function Home({ onAddToCart }: HomeProps) {
 
         @media (max-width: 560px) {
           .sp-home-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px !important;
           }
         }
       `}</style>

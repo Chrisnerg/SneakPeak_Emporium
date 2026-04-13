@@ -683,16 +683,6 @@ export default function Shop({ onAddToCart, defaultAudience = "all", title, desc
           .sp-shop-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
-
-          .sp-shop-layout > div > div:first-child {
-            display: none !important;
-          }
-        }
-
-        @media (max-width: 520px) {
-          .sp-shop-grid {
-            grid-template-columns: 1fr;
-          }
         }
       `}</style>
     </div>
