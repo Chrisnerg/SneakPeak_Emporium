@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { SlidersHorizontal, X } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import { CATALOG, type Audience, type Product } from "@/data/catalog";
 
@@ -21,6 +22,7 @@ export default function Shop({ onAddToCart, defaultAudience = "all", title, desc
   const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
   const [selectedConditions, setSelectedConditions] = useState<Array<(typeof CONDITIONS)[number]>>([]);
   const [sortMode, setSortMode] = useState<SortMode>("newest");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const audienceCounts = useMemo(
     () =>
@@ -71,12 +73,38 @@ export default function Shop({ onAddToCart, defaultAudience = "all", title, desc
     return filtered;
   }, [selectedAudiences, selectedBrands, selectedSizes, selectedConditions, sortMode]);
 
+  const activeFilterCount = selectedAudiences.length + selectedBrands.length + selectedSizes.length + selectedConditions.length;
+
+  const activeFilterChips = [
+    ...selectedAudiences.map((value) => ({ label: value, onRemove: () => setSelectedAudiences((current) => current.filter((item) => item !== value)) })),
+    ...selectedBrands.map((value) => ({ label: value, onRemove: () => setSelectedBrands((current) => current.filter((item) => item !== value)) })),
+    ...selectedSizes.map((value) => ({ label: `UK ${value}`, onRemove: () => setSelectedSizes((current) => current.filter((item) => item !== value)) })),
+    ...selectedConditions.map((value) => ({ label: value, onRemove: () => setSelectedConditions((current) => current.filter((item) => item !== value)) })),
+  ];
+
+  useEffect(() => {
+    if (!filtersOpen) {
+      return;
+    }
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [filtersOpen]);
+
   function resetFilters() {
     setSelectedAudiences(defaultAudience === "all" ? [] : [defaultAudience]);
     setSelectedBrands([]);
     setSelectedSizes([]);
     setSelectedConditions([]);
     setSortMode("newest");
+  }
+
+  function closeFilters() {
+    setFiltersOpen(false);
   }
 
   return (
@@ -160,8 +188,25 @@ export default function Shop({ onAddToCart, defaultAudience = "all", title, desc
               top: 88,
               minHeight: "100%",
             }}
-            className="sp-shop-sidebar"
+            className={`sp-shop-sidebar ${filtersOpen ? "sp-shop-sidebar-open" : ""}`}
           >
+            <div className="sp-mobile-filter-head" style={{ display: "none" }}>
+              <button
+                onClick={closeFilters}
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  fontSize: 10,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  cursor: "crosshair",
+                }}
+              >
+                Close
+              </button>
+            </div>
             {[
               {
                 title: "Category",
@@ -280,45 +325,179 @@ export default function Shop({ onAddToCart, defaultAudience = "all", title, desc
                 flexWrap: "wrap",
               }}
             >
-              <span
-                style={{
-                  fontSize: 8,
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  color: "#777",
-                  fontFamily: "'JetBrains Mono', monospace",
-                }}
-              >
-                Showing {visibleProducts.length} products
-              </span>
-              <select
-                value={sortMode}
-                onChange={(event) => setSortMode(event.target.value as SortMode)}
-                style={{
-                  border: "1px solid #0A0A0A",
-                  background: "transparent",
-                  padding: "8px 12px",
-                  fontSize: 9,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  fontFamily: "'JetBrains Mono', monospace",
-                  minWidth: 170,
-                }}
-              >
-                <option value="newest">Sort: Newest first</option>
-                <option value="price-low">Sort: Price low to high</option>
-                <option value="price-high">Sort: Price high to low</option>
-                <option value="brand">Sort: Brand A-Z</option>
-              </select>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                <button
+                  onClick={() => setFiltersOpen(true)}
+                  className="sp-mobile-filter-toggle"
+                  style={{
+                    display: "none",
+                    alignItems: "center",
+                    gap: 8,
+                    border: "1px solid #0A0A0A",
+                    background: "transparent",
+                    padding: "8px 12px",
+                    fontSize: 9,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    fontFamily: "'JetBrains Mono', monospace",
+                    cursor: "crosshair",
+                    fontWeight: 700,
+                  }}
+                >
+                  <SlidersHorizontal size={14} /> Filters {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
+                </button>
+                <span
+                  style={{
+                    fontSize: 8,
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
+                    color: "#777",
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
+                  Showing {visibleProducts.length} products
+                </span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={resetFilters}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      fontSize: 8,
+                      letterSpacing: "0.16em",
+                      textTransform: "uppercase",
+                      color: "#777",
+                      fontFamily: "'JetBrains Mono', monospace",
+                      cursor: "crosshair",
+                    }}
+                  >
+                    Clear all
+                  </button>
+                )}
+                <select
+                  value={sortMode}
+                  onChange={(event) => setSortMode(event.target.value as SortMode)}
+                  style={{
+                    border: "1px solid #0A0A0A",
+                    background: "transparent",
+                    padding: "8px 12px",
+                    fontSize: 9,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    fontFamily: "'JetBrains Mono', monospace",
+                    minWidth: 170,
+                  }}
+                >
+                  <option value="newest">Sort: Newest first</option>
+                  <option value="price-low">Sort: Price low to high</option>
+                  <option value="price-high">Sort: Price high to low</option>
+                  <option value="brand">Sort: Brand A-Z</option>
+                </select>
+              </div>
             </div>
 
-            <div className="sp-shop-grid" style={{ display: "grid", gap: 0 }}>
-              {visibleProducts.map((product) => (
-                <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} variant="shop" />
-              ))}
-            </div>
+            {activeFilterChips.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: "0 0 14px" }}>
+                {activeFilterChips.map((chip) => (
+                  <button
+                    key={chip.label}
+                    onClick={chip.onRemove}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      border: "1px solid rgba(0,0,0,0.18)",
+                      background: "#fff",
+                      padding: "6px 10px",
+                      fontSize: 8,
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                      color: "#0A0A0A",
+                      fontFamily: "'JetBrains Mono', monospace",
+                      cursor: "crosshair",
+                    }}
+                  >
+                    {chip.label} <X size={10} />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {visibleProducts.length === 0 ? (
+              <div
+                style={{
+                  border: "1px solid rgba(0,0,0,0.16)",
+                  padding: "34px 24px",
+                  background: "#F0ECE2",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 8,
+                    letterSpacing: "0.2em",
+                    textTransform: "uppercase",
+                    color: "#FF0000",
+                    fontFamily: "'JetBrains Mono', monospace",
+                    marginBottom: 10,
+                  }}
+                >
+                  No matches found
+                </div>
+                <h2
+                  style={{
+                    margin: "0 0 10px",
+                    fontSize: "clamp(24px, 3vw, 38px)",
+                    letterSpacing: "-0.04em",
+                    color: "#0A0A0A",
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
+                  Try clearing a few filters.
+                </h2>
+                <p
+                  style={{
+                    margin: "0 0 18px",
+                    maxWidth: 520,
+                    fontSize: 11,
+                    lineHeight: 1.8,
+                    color: "#555",
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
+                  Your current combination is too narrow. Reset filters to see the full catalog again.
+                </p>
+                <button
+                  onClick={resetFilters}
+                  style={{
+                    background: "#0A0A0A",
+                    color: "#F5F3EE",
+                    border: "none",
+                    padding: "12px 18px",
+                    fontSize: 9,
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
+                    fontFamily: "'JetBrains Mono', monospace",
+                    cursor: "crosshair",
+                    fontWeight: 700,
+                  }}
+                >
+                  Reset filters
+                </button>
+              </div>
+            ) : (
+              <div className="sp-shop-grid" style={{ display: "grid", gap: 0 }}>
+                {visibleProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} variant="shop" />
+                ))}
+              </div>
+            )}
           </div>
         </div>
+
+        {filtersOpen && <div className="sp-filter-backdrop" onClick={closeFilters} />}
       </section>
 
       <style>{`
@@ -340,14 +519,44 @@ export default function Shop({ onAddToCart, defaultAudience = "all", title, desc
           }
 
           .sp-shop-sidebar {
-            position: static !important;
-            border-right: none !important;
-            border-bottom: 1px solid rgba(0,0,0,0.16);
-            padding: 18px 14px !important;
+            position: fixed !important;
+            top: 0;
+            left: -100%;
+            bottom: 0;
+            width: min(360px, 88vw);
+            background: #F5F3EE;
+            z-index: 450;
+            overflow-y: auto;
+            border-right: 1px solid rgba(0,0,0,0.16) !important;
+            padding: 18px 14px 24px !important;
+            transition: left 0.2s ease;
+          }
+
+          .sp-shop-sidebar-open {
+            left: 0;
           }
 
           .sp-shop-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .sp-mobile-filter-toggle {
+            display: inline-flex !important;
+          }
+
+          .sp-mobile-filter-head {
+            display: flex !important;
+            justify-content: flex-end;
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+          }
+
+          .sp-filter-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 440;
           }
         }
 

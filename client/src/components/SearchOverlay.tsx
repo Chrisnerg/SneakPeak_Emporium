@@ -67,6 +67,19 @@ export default function SearchOverlay({ open, onOpen, onClose }: SearchOverlayPr
   const [query, setQuery] = useState("");
 
   useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [open]);
+
+  useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
       const isTypingTarget = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target?.isContentEditable;
@@ -136,6 +149,13 @@ export default function SearchOverlay({ open, onOpen, onClose }: SearchOverlayPr
     onClose();
   }
 
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (results[0]) {
+      handleNavigate(results[0].path);
+    }
+  }
+
   if (!open) {
     return null;
   }
@@ -163,7 +183,7 @@ export default function SearchOverlay({ open, onOpen, onClose }: SearchOverlayPr
         }}
         onClick={(event) => event.stopPropagation()}
       >
-        <div
+        <form
           style={{
             display: "flex",
             alignItems: "center",
@@ -172,6 +192,7 @@ export default function SearchOverlay({ open, onOpen, onClose }: SearchOverlayPr
             borderBottom: "2px solid #0A0A0A",
             background: "linear-gradient(180deg, #f2eee5 0%, #f5f3ee 100%)",
           }}
+          onSubmit={handleSubmit}
         >
           <Search size={16} />
           <input
@@ -204,7 +225,7 @@ export default function SearchOverlay({ open, onOpen, onClose }: SearchOverlayPr
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "crosshair" }}>
             <X size={18} />
           </button>
-        </div>
+        </form>
 
         <div style={{ padding: "12px 0", maxHeight: "70vh", overflowY: "auto" }}>
           <div

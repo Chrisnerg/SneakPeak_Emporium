@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { ArrowLeft, ShoppingBag } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
 import { useLocation, useRoute } from "wouter";
 import ProductCard from "@/components/ProductCard";
 import { CATALOG, type Product } from "@/data/catalog";
@@ -22,6 +22,10 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
   }, [match, productId]);
 
   const [selectedSize, setSelectedSize] = useState<number | null>(product?.sizes[0] ?? null);
+
+  useEffect(() => {
+    setSelectedSize(product?.sizes[0] ?? null);
+  }, [product?.id, product?.sizes]);
 
   if (!product) {
     return (
@@ -79,6 +83,36 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
         </div>
 
         <div style={{ padding: "56px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: 8,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: "#888",
+              fontFamily: "'JetBrains Mono', monospace",
+              marginBottom: 18,
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              onClick={() => setLocation("/")}
+              style={{ background: "none", border: "none", padding: 0, color: "inherit", cursor: "crosshair", font: "inherit" }}
+            >
+              Home
+            </button>
+            /
+            <button
+              onClick={() => setLocation("/shop")}
+              style={{ background: "none", border: "none", padding: 0, color: "inherit", cursor: "crosshair", font: "inherit" }}
+            >
+              Shop
+            </button>
+            /
+            <span>{product.name}</span>
+          </div>
           <button
             onClick={() => setLocation("/shop")}
             style={{
@@ -151,6 +185,47 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
             R{product.price.toLocaleString()}
           </div>
 
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+              gap: 10,
+              marginBottom: 24,
+            }}
+            className="sp-product-benefits"
+          >
+            {[
+              { icon: <ShieldCheck size={15} />, label: "Authentic" },
+              { icon: <Truck size={15} />, label: "Fast delivery" },
+              { icon: <ShoppingBag size={15} />, label: "Easy returns" },
+            ].map((item) => (
+              <div
+                key={item.label}
+                style={{
+                  border: "1px solid rgba(0,0,0,0.14)",
+                  padding: "12px 10px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                  alignItems: "flex-start",
+                }}
+              >
+                <span style={{ color: "#FF0000" }}>{item.icon}</span>
+                <span
+                  style={{
+                    fontSize: 8,
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
+                    color: "#555",
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
+
           <div style={{ marginBottom: 12 }}>
             <p
               style={{
@@ -184,6 +259,18 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
                 </button>
               ))}
             </div>
+            <p
+              style={{
+                margin: "12px 0 0",
+                fontSize: 9,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#666",
+                fontFamily: "'JetBrains Mono', monospace",
+              }}
+            >
+              {selectedSize ? `Selected size: UK ${selectedSize}` : "Select your size to continue"}
+            </p>
           </div>
 
           <button
@@ -209,6 +296,18 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
           >
             <ShoppingBag size={15} /> Add to bag
           </button>
+
+          <p
+            style={{
+              margin: "14px 0 0",
+              fontSize: 10,
+              lineHeight: 1.8,
+              color: "#666",
+              fontFamily: "'JetBrains Mono', monospace",
+            }}
+          >
+            Ships from Johannesburg in 1-3 business days. Free delivery over R800.
+          </p>
         </div>
       </section>
 
@@ -253,6 +352,10 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
       <style>{`
         @media (max-width: 980px) {
           .sp-product-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .sp-product-benefits {
             grid-template-columns: 1fr !important;
           }
         }
